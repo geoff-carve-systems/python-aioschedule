@@ -5,7 +5,6 @@ from setuptools import setup
 SCHEDULE_VERSION = "1.1.0"
 SCHEDULE_DOWNLOAD_URL = "https://github.com/dbader/schedule/tarball/" + SCHEDULE_VERSION
 
-
 def read_file(filename):
     """
     Read a utf8 encoded text file and return its contents.
@@ -15,30 +14,24 @@ def read_file(filename):
 
 
 setup(
-    name="schedule",
-    packages=["schedule"],
-    package_data={"schedule": ["py.typed"]},
+    name='aioschedule',
+    packages=['aioschedule'],
+    package_data={"aioschedule": ["py.typed"]},
     version=SCHEDULE_VERSION,
-    description="Job scheduling for humans.",
-    long_description=read_file("README.rst"),
-    license="MIT",
-    author="Daniel Bader",
-    author_email="mail@dbader.org",
-    url="https://github.com/dbader/schedule",
+    description='Job scheduling for humans.',
+    long_description=read_file('README.rst'),
+    license='MIT',
+    author='Daniel Bader, Cochise Ruhulessin',
+    author_email='development@ibrb.io',
+    url='https://github.com/ibrb/python-aioschedule',
     download_url=SCHEDULE_DOWNLOAD_URL,
     keywords=[
-        "schedule",
-        "periodic",
-        "jobs",
-        "scheduling",
-        "clockwork",
-        "cron",
-        "scheduler",
-        "job scheduling",
+        'aioschedule', 'periodic', 'jobs', 'scheduling', 'clockwork',
+        'cron', 'scheduler', 'job scheduling'
     ],
     classifiers=[
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
         "Development Status :: 5 - Production/Stable",
         "Operating System :: OS Independent",
         "Programming Language :: Python",

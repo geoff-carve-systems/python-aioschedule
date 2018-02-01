@@ -1,0 +1,9 @@
+sudo: false
+language: python
+python:
+    - "3.5"
+    - "3.6"
+install: pip install tox-travis coveralls
+script:
+    - tox
+    - if [ $TRAVIS_TEST_RESULT -eq 0 ]; then coveralls; fi

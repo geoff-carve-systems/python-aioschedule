@@ -1,15 +1,18 @@
 schedule
 ========
 
+.. image:: https://api.travis-ci.org/ibrb/python-aioschedule.svg?branch=master
+        :target: https://travis-ci.org/ibrb/python-aioschedule
 
-.. image:: https://github.com/dbader/schedule/workflows/Tests/badge.svg
-        :target: https://github.com/dbader/schedule/actions?query=workflow%3ATests+branch%3Amaster
+.. image:: https://coveralls.io/repos/ibrb/python-aioschedule/badge.svg?branch=master
+        :target: https://coveralls.io/r/ibrb/python-aioschedule
 
-.. image:: https://coveralls.io/repos/dbader/schedule/badge.svg?branch=master
-        :target: https://coveralls.io/r/dbader/schedule
+.. image:: https://img.shields.io/pypi/v/aioschedule.svg
+        :target: https://pypi.python.org/pypi/aioschedule
 
-.. image:: https://img.shields.io/pypi/v/schedule.svg
-        :target: https://pypi.python.org/pypi/schedule
+.. image:: https://media.ibrb.org/ibr/images/logos/landscape1200.png
+        :target: https://media.ibrb.org/ibr/images/logos/landscape1200.png
+
 
 Python job scheduling for humans. Run Python functions (or any other callable) periodically using a friendly syntax.
 
@@ -25,27 +28,32 @@ Python job scheduling for humans. Run Python functions (or any other callable) p
 
 .. code-block:: bash
 
-    $ pip install schedule
+    $ pip install aioschedule
 
 .. code-block:: python
 
-    import schedule
+    import asyncio
+    import aioschedule as schedule
     import time
 
-    def job():
-        print("I'm working...")
+    async def job(message='stuff', n=1):
+        print("Asynchronous invocation (%s) of I'm working on:" % n, message)
+        asyncio.sleep(1)
 
-    schedule.every(10).minutes.do(job)
-    schedule.every().hour.do(job)
+    for i in range(1,3):
+        schedule.every(1).seconds.do(job, n=i)
+    schedule.every(5).to(10).days.do(job)
+    schedule.every().hour.do(job, message='things')
     schedule.every().day.at("10:30").do(job)
     schedule.every().monday.do(job)
     schedule.every().wednesday.at("13:15").do(job)
     schedule.every().day.at("12:42", "Europe/Amsterdam").do(job)
     schedule.every().minute.at(":17").do(job)
 
+    loop = asyncio.get_event_loop()
     while True:
-        schedule.run_pending()
-        time.sleep(1)
+        loop.run_until_complete(schedule.run_pending())
+        time.sleep(0.1)
 
 
 More :doc:`examples`

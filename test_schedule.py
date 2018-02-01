@@ -1,4 +1,6 @@
+#!/usr/bin/env python3
 """Unit tests for schedule.py"""
+import asyncio
 import datetime
 import functools
 import mock
@@ -10,8 +12,13 @@ import time
 # "class already defined", and "too many public methods" messages:
 # pylint: disable-msg=R0201,C0111,E0102,R0904,R0901
 
-import schedule
-from schedule import (
+
+# Set timezone to Europe/Berlin (CEST) to ensure global reproducibility
+os.environ["TZ"] = "CET-1CEST,M3.5.0,M10.5.0"
+time.tzset()
+
+import aioschedule as schedule
+from aioschedule import (
     every,
     repeat,
     ScheduleError,
@@ -19,15 +26,27 @@ from schedule import (
     IntervalError,
 )
 
-# Set timezone to Europe/Berlin (CEST) to ensure global reproducibility
-os.environ["TZ"] = "CET-1CEST,M3.5.0,M10.5.0"
-time.tzset()
-
-
 def make_mock_job(name=None):
-    job = mock.Mock()
-    job.__name__ = name or "job"
+    job = Mock()
+    job.__name__ = name or 'job'
     return job
+
+
+class Mock:
+    invoked = None
+    call_count = 0
+
+    def reset_mock(self):
+        self.invoked = None
+        self.call_count = 0
+
+    def assert_called_once_with(self, *args, **kwargs):
+        self.invoked == (args, kwargs)
+        assert self.call_count == 1
+
+    async def __call__(self, *args, **kwargs):
+        self.invoked = args, kwargs
+        self.call_count += 1
 
 
 class mock_datetime(object):
@@ -75,6 +94,12 @@ class mock_datetime(object):
 class SchedulerTests(unittest.TestCase):
     def setUp(self):
         schedule.clear()
+
+    def run_async(self, func, *args, **kwargs):
+        loop = asyncio.get_event_loop()
+        fut = asyncio.ensure_future(func(*args, **kwargs))
+        loop.run_until_complete(fut)
+        return fut.result()
 
     def test_time_units(self):
         assert every().seconds.unit == "seconds"
@@ -578,8 +603,8 @@ class SchedulerTests(unittest.TestCase):
         mock_job = make_mock_job()
         every().minute.do(mock_job)
         every().hour.do(mock_job)
-        every().day.at("11:00").do(mock_job)
-        schedule.run_all()
+        every().day.at('11:00').do(mock_job)
+        self.run_async(schedule.run_all)
         assert mock_job.call_count == 3
 
     def test_run_all_with_decorator(self):
@@ -622,9 +647,9 @@ class SchedulerTests(unittest.TestCase):
 
     def test_job_func_args_are_passed_on(self):
         mock_job = make_mock_job()
-        every().second.do(mock_job, 1, 2, "three", foo=23, bar={})
-        schedule.run_all()
-        mock_job.assert_called_once_with(1, 2, "three", foo=23, bar={})
+        every().second.do(mock_job, 1, 2, 'three', foo=23, bar={})
+        self.run_async(schedule.run_all)
+        mock_job.assert_called_once_with(1, 2, 'three', foo=23, bar={})
 
     def test_to_string(self):
         def job_fun():
@@ -702,79 +727,79 @@ class SchedulerTests(unittest.TestCase):
             every().hour.do(mock_job)
             every().day.do(mock_job)
             every().sunday.do(mock_job)
-            schedule.run_pending()
+            self.run_async(schedule.run_pending)
             assert mock_job.call_count == 0
 
         with mock_datetime(2010, 1, 6, 12, 16):
-            schedule.run_pending()
+            self.run_async(schedule.run_pending)
             assert mock_job.call_count == 1
 
         with mock_datetime(2010, 1, 6, 13, 16):
             mock_job.reset_mock()
-            schedule.run_pending()
+            self.run_async(schedule.run_pending)
             assert mock_job.call_count == 2
 
         with mock_datetime(2010, 1, 7, 13, 16):
             mock_job.reset_mock()
-            schedule.run_pending()
+            self.run_async(schedule.run_pending)
             assert mock_job.call_count == 3
 
         with mock_datetime(2010, 1, 10, 13, 16):
             mock_job.reset_mock()
-            schedule.run_pending()
+            self.run_async(schedule.run_pending)
             assert mock_job.call_count == 4
 
     def test_run_every_weekday_at_specific_time_today(self):
         mock_job = make_mock_job()
         with mock_datetime(2010, 1, 6, 13, 16):
-            every().wednesday.at("14:12").do(mock_job)
-            schedule.run_pending()
+            every().wednesday.at('14:12').do(mock_job)
+            self.run_async(schedule.run_pending)
             assert mock_job.call_count == 0
 
         with mock_datetime(2010, 1, 6, 14, 16):
-            schedule.run_pending()
+            self.run_async(schedule.run_pending)
             assert mock_job.call_count == 1
 
     def test_run_every_weekday_at_specific_time_past_today(self):
         mock_job = make_mock_job()
         with mock_datetime(2010, 1, 6, 13, 16):
-            every().wednesday.at("13:15").do(mock_job)
-            schedule.run_pending()
+            every().wednesday.at('13:15').do(mock_job)
+            self.run_async(schedule.run_pending)
             assert mock_job.call_count == 0
 
         with mock_datetime(2010, 1, 13, 13, 14):
-            schedule.run_pending()
+            self.run_async(schedule.run_pending)
             assert mock_job.call_count == 0
 
         with mock_datetime(2010, 1, 13, 13, 16):
-            schedule.run_pending()
+            self.run_async(schedule.run_pending)
             assert mock_job.call_count == 1
 
     def test_run_every_n_days_at_specific_time(self):
         mock_job = make_mock_job()
         with mock_datetime(2010, 1, 6, 11, 29):
-            every(2).days.at("11:30").do(mock_job)
-            schedule.run_pending()
+            every(2).days.at('11:30').do(mock_job)
+            self.run_async(schedule.run_pending)
             assert mock_job.call_count == 0
 
         with mock_datetime(2010, 1, 6, 11, 31):
-            schedule.run_pending()
+            self.run_async(schedule.run_pending)
             assert mock_job.call_count == 0
 
         with mock_datetime(2010, 1, 7, 11, 31):
-            schedule.run_pending()
+            self.run_async(schedule.run_pending)
             assert mock_job.call_count == 0
 
         with mock_datetime(2010, 1, 8, 11, 29):
-            schedule.run_pending()
+            self.run_async(schedule.run_pending)
             assert mock_job.call_count == 0
 
         with mock_datetime(2010, 1, 8, 11, 31):
-            schedule.run_pending()
+            self.run_async(schedule.run_pending)
             assert mock_job.call_count == 1
 
         with mock_datetime(2010, 1, 10, 11, 31):
-            schedule.run_pending()
+            self.run_async(schedule.run_pending)
             assert mock_job.call_count == 2
 
     def test_next_run_property(self):
@@ -801,7 +826,7 @@ class SchedulerTests(unittest.TestCase):
             assert schedule.idle_seconds() is None
 
     def test_cancel_job(self):
-        def stop_job():
+        async def stop_job():
             return schedule.CancelJob
 
         mock_job = make_mock_job()
@@ -810,7 +835,7 @@ class SchedulerTests(unittest.TestCase):
         mj = every().second.do(mock_job)
         assert len(schedule.jobs) == 2
 
-        schedule.run_all()
+        self.run_async(schedule.run_all)
         assert len(schedule.jobs) == 1
         assert schedule.jobs[0] == mj
 
@@ -823,7 +848,7 @@ class SchedulerTests(unittest.TestCase):
         assert len(schedule.jobs) == 0
 
     def test_cancel_jobs(self):
-        def stop_job():
+        async def stop_job():
             return schedule.CancelJob
 
         every().second.do(stop_job)
@@ -831,7 +856,7 @@ class SchedulerTests(unittest.TestCase):
         every().second.do(stop_job)
         assert len(schedule.jobs) == 3
 
-        schedule.run_all()
+        self.run_async(schedule.run_all)
         assert len(schedule.jobs) == 0
 
     def test_tag_type_enforcement(self):
@@ -876,7 +901,7 @@ class SchedulerTests(unittest.TestCase):
             "tag3", "tag3", "tag3", "tag2"
         )
         assert len(schedule.jobs) == 3
-        schedule.run_all()
+        self.run_async(schedule.run_all)
         assert len(schedule.jobs) == 3
         schedule.clear("tag3")
         assert len(schedule.jobs) == 2
@@ -896,4 +921,8 @@ class SchedulerTests(unittest.TestCase):
         scheduler = schedule.Scheduler()
         scheduler.every()
         scheduler.every(10).seconds
-        scheduler.run_pending()
+        self.run_async(scheduler.run_pending)
+
+
+if __name__ == '__main__':
+    unittest.main()

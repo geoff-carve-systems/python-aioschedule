@@ -1,7 +1,9 @@
 """
 Python job scheduling for humans.
 
-github.com/dbader/schedule
+github.com/ibrb/python-aioschedule
+
+Forked from github.com/dbader/schedule.
 
 An in-process scheduler for periodic jobs that uses the builder pattern
 for configuration. Schedule lets you run Python functions (or any other
@@ -18,25 +20,31 @@ Features:
     - Tested on Python 3.6, 3.7, 3.8, 3.9
 
 Usage:
-    >>> import schedule
+    >>> import asyncio
+    >>> import aioschedule as schedule
     >>> import time
 
-    >>> def job(message='stuff'):
-    >>>     print("I'm working on:", message)
+    >>> async def job(message='stuff', n=1):
+    >>>     print("Asynchronous invocation (%s) of I'm working on:" % n, message)
+    >>>     asyncio.sleep(1)
 
-    >>> schedule.every(10).minutes.do(job)
+    >>> for i in range(1,3):
+    >>>     schedule.every(1).seconds.do(job, n=i)
     >>> schedule.every(5).to(10).days.do(job)
     >>> schedule.every().hour.do(job, message='things')
     >>> schedule.every().day.at("10:30").do(job)
 
+    >>> loop = asyncio.get_event_loop()
     >>> while True:
-    >>>     schedule.run_pending()
-    >>>     time.sleep(1)
+    >>>     loop.run_until_complete(schedule.run_pending())
+    >>>     time.sleep(0.1)
 
 [1] https://adam.herokuapp.com/past/2010/4/13/rethinking_cron/
 [2] https://github.com/Rykian/clockwork
 [3] https://adam.herokuapp.com/past/2010/6/30/replace_cron_with_clockwork/
 """
+import asyncio
+import collections
 from collections.abc import Hashable
 import datetime
 import functools
@@ -85,9 +93,8 @@ class Scheduler(object):
     def __init__(self) -> None:
         self.jobs: List[Job] = []
 
-    def run_pending(self) -> None:
-        """
-        Run all jobs that are scheduled to run.
+    async def run_pending(self):
+        """Run all jobs that are scheduled to run.
 
         Please note that it is *intended behavior that run_pending()
         does not run missed jobs*. For example, if you've registered a job
@@ -95,11 +102,11 @@ class Scheduler(object):
         in one hour increments then your job won't be run 60 times in
         between but only once.
         """
-        runnable_jobs = (job for job in self.jobs if job.should_run)
-        for job in sorted(runnable_jobs):
-            self._run_job(job)
+        jobs = [job.run() for job in self.jobs if job.should_run]
+        if jobs:
+            await asyncio.wait(jobs)
 
-    def run_all(self, delay_seconds: int = 0) -> None:
+    async def run_all(self, delay_seconds: int = 0) -> None:
         """
         Run all jobs regardless if they are scheduled to run or not.
 
@@ -109,14 +116,12 @@ class Scheduler(object):
 
         :param delay_seconds: A delay added between every executed job
         """
-        logger.debug(
-            "Running *all* %i jobs with %is delay in between",
-            len(self.jobs),
-            delay_seconds,
-        )
-        for job in self.jobs[:]:
-            self._run_job(job)
-            time.sleep(delay_seconds)
+        if delay_seconds:
+            warnings.warn("The `delay_seconds` parameter is deprecated.",
+                DeprecationWarning)
+        jobs = [self._run_job(job) for job in self.jobs[:]]
+        if jobs:
+            await asyncio.wait(jobs)
 
     def get_jobs(self, tag: Optional[Hashable] = None) -> List["Job"]:
         """
@@ -168,8 +173,8 @@ class Scheduler(object):
         job = Job(interval, self)
         return job
 
-    def _run_job(self, job: "Job") -> None:
-        ret = job.run()
+    async def _run_job(self, job: "Job") -> None:
+        ret = await job.run()
         if isinstance(ret, CancelJob) or ret is CancelJob:
             self.cancel_job(job)
 
@@ -669,7 +674,7 @@ class Job(object):
         assert self.next_run is not None, "must run _schedule_next_run before"
         return datetime.datetime.now() >= self.next_run
 
-    def run(self):
+    async def run(self):
         """
         Run the job and immediately reschedule it.
         If the job's deadline is reached (configured using .until()), the job is not
@@ -686,7 +691,7 @@ class Job(object):
             return CancelJob
 
         logger.debug("Running job %s", self)
-        ret = self.job_func()
+        ret = await self.job_func()
         self.last_run = datetime.datetime.now()
         self._schedule_next_run()
 
@@ -811,18 +816,18 @@ def every(interval: int = 1) -> Job:
     return default_scheduler.every(interval)
 
 
-def run_pending() -> None:
+async def run_pending() -> None:
     """Calls :meth:`run_pending <Scheduler.run_pending>` on the
     :data:`default scheduler instance <default_scheduler>`.
     """
-    default_scheduler.run_pending()
+    await default_scheduler.run_pending()
 
 
-def run_all(delay_seconds: int = 0) -> None:
+async def run_all(delay_seconds: int = 0) -> None:
     """Calls :meth:`run_all <Scheduler.run_all>` on the
     :data:`default scheduler instance <default_scheduler>`.
     """
-    default_scheduler.run_all(delay_seconds=delay_seconds)
+    await default_scheduler.run_all(delay_seconds=delay_seconds)
 
 
 def get_jobs(tag: Optional[Hashable] = None) -> List[Job]:

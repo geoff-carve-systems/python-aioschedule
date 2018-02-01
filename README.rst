@@ -1,17 +1,21 @@
-`schedule <https://schedule.readthedocs.io/>`__
-===============================================
+aioschedule
+===========
 
 
-.. image:: https://github.com/dbader/schedule/workflows/Tests/badge.svg
-        :target: https://github.com/dbader/schedule/actions?query=workflow%3ATests+branch%3Amaster
+.. image:: https://api.travis-ci.org/ibrb/python-aioschedule.svg?branch=master
+        :target: https://travis-ci.org/ibrb/python-aioschedule
 
-.. image:: https://coveralls.io/repos/dbader/schedule/badge.svg?branch=master
-        :target: https://coveralls.io/r/dbader/schedule
+.. image:: https://coveralls.io/repos/ibrb/python-aioschedule/badge.svg?branch=master
+        :target: https://coveralls.io/r/ibrb/python-aioschedule
 
-.. image:: https://img.shields.io/pypi/v/schedule.svg
-        :target: https://pypi.python.org/pypi/schedule
+.. image:: https://img.shields.io/pypi/v/aioschedule.svg
+        :target: https://pypi.python.org/pypi/aioschedule
 
-Python job scheduling for humans. Run Python functions (or any other callable) periodically using a friendly syntax.
+.. image:: https://media.ibrb.org/ibr/images/logos/landscape1200.png
+        :target: https://media.ibrb.org/ibr/images/logos/landscape1200.png
+
+
+Python job scheduling for humans. Forked and modified from github.com/dbader/schedule.
 
 - A simple to use API for scheduling jobs, made for humans.
 - In-process scheduler for periodic jobs. No extra processes needed!
@@ -24,34 +28,28 @@ Usage
 
 .. code-block:: bash
 
-    $ pip install schedule
+    $ pip install aioschedule
 
 .. code-block:: python
 
-    import schedule
+    import asyncio
+    import aioschedule as schedule
     import time
 
-    def job():
-        print("I'm working...")
-    
-    schedule.every(10).seconds.do(job)
-    schedule.every(10).minutes.do(job)
-    schedule.every().hour.do(job)
-    schedule.every().day.at("10:30").do(job)
-    schedule.every(5).to(10).minutes.do(job)
-    schedule.every().monday.do(job)
-    schedule.every().wednesday.at("13:15").do(job)
-    schedule.every().day.at("12:42", "Europe/Amsterdam").do(job)
-    schedule.every().minute.at(":17").do(job)
+    async def job(message='stuff', n=1):
+        print("Asynchronous invocation (%s) of I'm working on:" % n, message)
+        asyncio.sleep(1)
 
-    def job_with_argument(name):
-        print(f"I am {name}")
-        
-    schedule.every(10).seconds.do(job_with_argument, name="Peter")
-        
+    for i in range(1,3):
+        schedule.every(1).seconds.do(job, n=i)
+    schedule.every(5).to(10).days.do(job)
+    schedule.every().hour.do(job, message='things')
+    schedule.every().day.at("10:30").do(job)
+
+    loop = asyncio.get_event_loop()
     while True:
-        schedule.run_pending()
-        time.sleep(1)
+        loop.run_until_complete(schedule.run_pending())
+        time.sleep(0.1)
 
 Documentation
 -------------
@@ -59,13 +57,21 @@ Documentation
 Schedule's documentation lives at `schedule.readthedocs.io <https://schedule.readthedocs.io/>`_.
 
 
+Development
+-----------
+Run `vagrant up` to spawn a virtual machine containing the development
+environment. Make sure to set the `IBR_GIT_COMMITTER_NAME` and
+`IBR_GIT_COMMITTER_EMAIL` environment variables.
+
+
 Meta
 ----
 
-Daniel Bader - `@dbader_org <https://twitter.com/dbader_org>`_ - mail@dbader.org
+- Daniel Bader - `@dbader_org <https://twitter.com/dbader_org>`_ - mail@dbader.org
+- Cochise Ruhulessin - `@magicalcochise <https://twitter.com/magicalcochise>`_ - c.ruhulessin@ibrb.org
 
 Inspired by `Adam Wiggins' <https://github.com/adamwiggins>`_ article `"Rethinking Cron" <https://adam.herokuapp.com/past/2010/4/13/rethinking_cron/>`_ and the `clockwork <https://github.com/Rykian/clockwork>`_ Ruby module.
 
 Distributed under the MIT license. See `LICENSE.txt <https://github.com/dbader/schedule/blob/master/LICENSE.txt>`_ for more information.
 
-https://github.com/dbader/schedule
+https://github.com/ibrb/python-aioschedule
