@@ -370,11 +370,11 @@ class SchedulerTests(unittest.TestCase):
             mock_job.reset_mock()
             every(5).seconds.until(datetime.time(11, 35, 20)).do(mock_job)
             with mock_datetime(2020, 1, 1, 11, 35, 15):
-                schedule.run_pending()
+                self.run_async(schedule.run_pending)
                 assert mock_job.call_count == 1
                 assert len(schedule.jobs) == 1
             with mock_datetime(2020, 1, 1, 11, 35, 20):
-                schedule.run_all()
+                self.run_async(schedule.run_all)
                 assert mock_job.call_count == 2
                 assert len(schedule.jobs) == 0
 
@@ -384,7 +384,7 @@ class SchedulerTests(unittest.TestCase):
             mock_job.reset_mock()
             every(5).seconds.until(datetime.time(11, 35, 20)).do(mock_job)
             with mock_datetime(2020, 1, 1, 11, 35, 50):
-                schedule.run_pending()
+                self.run_async(schedule.run_pending)
                 assert mock_job.call_count == 0
                 assert len(schedule.jobs) == 0
 
@@ -497,14 +497,14 @@ class SchedulerTests(unittest.TestCase):
         # scheduled at 23:30 the same day. This simulates a job that started
         # on day 1 at 23:30 and took 1,5 hours to finish
         with mock_datetime(2010, 12, 2, 1, 0, 0):
-            job.run()
+            self.run_async(job.run)
             assert job.next_run.day == 2
             assert job.next_run.hour == 23
 
         # Run the job at 23:30 on day 2, afterwards the job should be
         # scheduled at 23:30 the next day
         with mock_datetime(2010, 12, 2, 23, 30, 0):
-            job.run()
+            self.run_async(job.run)
             assert job.next_run.day == 3
             assert job.next_run.hour == 23
 
@@ -516,12 +516,12 @@ class SchedulerTests(unittest.TestCase):
             assert job.next_run.minute == 10
 
         with mock_datetime(2010, 10, 10, 13, 0, 0):
-            job.run()
+            self.run_async(job.run)
             assert job.next_run.hour == 13
             assert job.next_run.minute == 10
 
         with mock_datetime(2010, 10, 10, 13, 15, 0):
-            job.run()
+            self.run_async(job.run)
             assert job.next_run.hour == 14
             assert job.next_run.minute == 10
 
@@ -533,17 +533,17 @@ class SchedulerTests(unittest.TestCase):
             assert job.next_run.second == 15
 
         with mock_datetime(2010, 10, 10, 10, 10, 59):
-            job.run()
+            self.run_async(job.run)
             assert job.next_run.minute == 11
             assert job.next_run.second == 15
 
         with mock_datetime(2010, 10, 10, 10, 12, 14):
-            job.run()
+            self.run_async(job.run)
             assert job.next_run.minute == 12
             assert job.next_run.second == 15
 
         with mock_datetime(2010, 10, 10, 10, 12, 16):
-            job.run()
+            self.run_async(job.run)
             assert job.next_run.minute == 13
             assert job.next_run.second == 15
 
@@ -611,38 +611,38 @@ class SchedulerTests(unittest.TestCase):
         mock_job = make_mock_job()
 
         @repeat(every().minute)
-        def job1():
-            mock_job()
+        async def job1():
+            await mock_job()
 
         @repeat(every().hour)
-        def job2():
-            mock_job()
+        async def job2():
+            await mock_job()
 
         @repeat(every().day.at("11:00"))
-        def job3():
-            mock_job()
+        async def job3():
+            await mock_job()
 
-        schedule.run_all()
+        self.run_async(schedule.run_all)
         assert mock_job.call_count == 3
 
     def test_run_all_with_decorator_args(self):
         mock_job = make_mock_job()
 
         @repeat(every().minute, 1, 2, "three", foo=23, bar={})
-        def job(*args, **kwargs):
-            mock_job(*args, **kwargs)
+        async def job(*args, **kwargs):
+            await mock_job(*args, **kwargs)
 
-        schedule.run_all()
+        self.run_async(schedule.run_all)
         mock_job.assert_called_once_with(1, 2, "three", foo=23, bar={})
 
     def test_run_all_with_decorator_defaultargs(self):
         mock_job = make_mock_job()
 
         @repeat(every().minute)
-        def job(nothing=None):
-            mock_job(nothing)
+        async def job(nothing=None):
+            await mock_job(nothing)
 
-        schedule.run_all()
+        self.run_async(schedule.run_all)
         mock_job.assert_called_once_with(None)
 
     def test_job_func_args_are_passed_on(self):
