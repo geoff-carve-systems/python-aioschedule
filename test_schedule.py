@@ -354,15 +354,16 @@ class SchedulerTests(unittest.TestCase):
         self.assertRaises(ScheduleValueError, every().day.until, "01-01-3000")
 
         # Using .until() with moments in the passed
-        self.assertRaises(
-            ScheduleValueError,
-            every().day.until,
-            datetime.datetime(2019, 12, 31, 23, 59),
-        )
-        self.assertRaises(
-            ScheduleValueError, every().day.until, datetime.timedelta(minutes=-1)
-        )
-        self.assertRaises(ScheduleValueError, every().day.until, datetime.time(hour=5))
+        with mock_datetime(2020, 1, 1, 10, 0, 0):
+            self.assertRaises(
+                ScheduleValueError,
+                every().day.until,
+                datetime.datetime(2019, 12, 31, 23, 59),
+            )
+            self.assertRaises(
+                ScheduleValueError, every().day.until, datetime.timedelta(minutes=-1)
+            )
+            self.assertRaises(ScheduleValueError, every().day.until, datetime.time(hour=5))
 
         # Unschedule job after next_run passes the deadline
         schedule.clear()
