@@ -127,11 +127,12 @@ class Scheduler(object):
 		|                             | futures finish or are cancelled.       |
 		+-----------------------------+----------------------------------------+
         """
-        jobs = [self._run_job(job) for job in sorted([job for job in self.jobs if job.should_run])]
-        if not jobs:
+        tasks = [asyncio.create_task(self._run_job(job)) for job in 
+            sorted([job for job in self.jobs if job.should_run])]
+        if not tasks:
             return [], []
 
-        return await asyncio.wait(jobs, *args, **kwargs)
+        return await asyncio.wait(tasks, *args, **kwargs)
 
     async def run_all(self, delay_seconds=0, *args, **kwargs):
         """Run all jobs regardless if they are scheduled to run or not.
@@ -164,11 +165,11 @@ class Scheduler(object):
         if delay_seconds:
             warnings.warn("The `delay_seconds` parameter is deprecated.",
                 DeprecationWarning)
-        jobs = [self._run_job(job) for job in self.jobs[:]]
-        if not jobs:
+        tasks = [asyncio.create_task(self._run_job(job)) for job in self.jobs[:]]
+        if not tasks:
             return [], []
 
-        return await asyncio.wait(jobs, *args, **kwargs)
+        return await asyncio.wait(tasks, *args, **kwargs)
 
     def get_jobs(self, tag: Optional[Hashable] = None) -> List["Job"]:
         """
