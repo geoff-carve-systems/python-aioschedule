@@ -3,7 +3,11 @@ from setuptools import setup
 
 
 SCHEDULE_VERSION = "1.1.1"
-SCHEDULE_DOWNLOAD_URL = "https://github.com/geoff-carve-systems/python-aioschedule/tarball/" + SCHEDULE_VERSION
+SCHEDULE_DOWNLOAD_URL = (
+    "https://github.com/geoff-carve-systems/python-aioschedule/tarball/"
+    + SCHEDULE_VERSION
+)
+
 
 def read_file(filename):
     """
@@ -14,24 +18,30 @@ def read_file(filename):
 
 
 setup(
-    name='aioschedule',
-    packages=['aioschedule'],
+    name="aioschedule",
+    packages=["aioschedule"],
     package_data={"aioschedule": ["py.typed"]},
     version=SCHEDULE_VERSION,
-    description='Job scheduling for humans.',
-    long_description=read_file('README.rst'),
-    license='MIT',
-    author='Daniel Bader, Cochise Ruhulessin, Geoff Robinson',
-    author_email='geoff.robinson@carvesystems.com',
-    url='https://github.com/geoff-carve-systems/python-aioschedule',
+    description="Job scheduling for humans.",
+    long_description=read_file("README.rst"),
+    license="MIT",
+    author="Daniel Bader, Cochise Ruhulessin, Geoff Robinson",
+    author_email="geoff.robinson@carvesystems.com",
+    url="https://github.com/geoff-carve-systems/python-aioschedule",
     download_url=SCHEDULE_DOWNLOAD_URL,
     keywords=[
-        'aioschedule', 'periodic', 'jobs', 'scheduling', 'clockwork',
-        'cron', 'scheduler', 'job scheduling'
+        "aioschedule",
+        "periodic",
+        "jobs",
+        "scheduling",
+        "clockwork",
+        "cron",
+        "scheduler",
+        "job scheduling",
     ],
     classifiers=[
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
         "Development Status :: 5 - Production/Stable",
         "Operating System :: OS Independent",
         "Programming Language :: Python",

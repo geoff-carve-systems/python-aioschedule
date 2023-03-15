@@ -26,9 +26,10 @@ from aioschedule import (
     IntervalError,
 )
 
+
 def make_mock_job(name=None):
     job = Mock()
-    job.__name__ = name or 'job'
+    job.__name__ = name or "job"
     return job
 
 
@@ -363,7 +364,9 @@ class SchedulerTests(unittest.TestCase):
             self.assertRaises(
                 ScheduleValueError, every().day.until, datetime.timedelta(minutes=-1)
             )
-            self.assertRaises(ScheduleValueError, every().day.until, datetime.time(hour=5))
+            self.assertRaises(
+                ScheduleValueError, every().day.until, datetime.time(hour=5)
+            )
 
         # Unschedule job after next_run passes the deadline
         schedule.clear()
@@ -604,7 +607,7 @@ class SchedulerTests(unittest.TestCase):
         mock_job = make_mock_job()
         every().minute.do(mock_job)
         every().hour.do(mock_job)
-        every().day.at('11:00').do(mock_job)
+        every().day.at("11:00").do(mock_job)
         self.run_async(schedule.run_all)
         assert mock_job.call_count == 3
 
@@ -648,9 +651,9 @@ class SchedulerTests(unittest.TestCase):
 
     def test_job_func_args_are_passed_on(self):
         mock_job = make_mock_job()
-        every().second.do(mock_job, 1, 2, 'three', foo=23, bar={})
+        every().second.do(mock_job, 1, 2, "three", foo=23, bar={})
         self.run_async(schedule.run_all)
-        mock_job.assert_called_once_with(1, 2, 'three', foo=23, bar={})
+        mock_job.assert_called_once_with(1, 2, "three", foo=23, bar={})
 
     def test_to_string(self):
         def job_fun():
@@ -753,7 +756,7 @@ class SchedulerTests(unittest.TestCase):
     def test_run_every_weekday_at_specific_time_today(self):
         mock_job = make_mock_job()
         with mock_datetime(2010, 1, 6, 13, 16):
-            every().wednesday.at('14:12').do(mock_job)
+            every().wednesday.at("14:12").do(mock_job)
             self.run_async(schedule.run_pending)
             assert mock_job.call_count == 0
 
@@ -764,7 +767,7 @@ class SchedulerTests(unittest.TestCase):
     def test_run_every_weekday_at_specific_time_past_today(self):
         mock_job = make_mock_job()
         with mock_datetime(2010, 1, 6, 13, 16):
-            every().wednesday.at('13:15').do(mock_job)
+            every().wednesday.at("13:15").do(mock_job)
             self.run_async(schedule.run_pending)
             assert mock_job.call_count == 0
 
@@ -779,7 +782,7 @@ class SchedulerTests(unittest.TestCase):
     def test_run_every_n_days_at_specific_time(self):
         mock_job = make_mock_job()
         with mock_datetime(2010, 1, 6, 11, 29):
-            every(2).days.at('11:30').do(mock_job)
+            every(2).days.at("11:30").do(mock_job)
             self.run_async(schedule.run_pending)
             assert mock_job.call_count == 0
 
@@ -925,5 +928,5 @@ class SchedulerTests(unittest.TestCase):
         self.run_async(scheduler.run_pending)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -102,33 +102,35 @@ class Scheduler(object):
         in one hour increments then your job won't be run 60 times in
         between but only once.
 
-		*timeout* can be used to control the maximum number of seconds to wait before
-		returning.  *timeout* can be an int or float.  If *timeout* is not specified
-		or ``None``, there is no limit to the wait time.
+                *timeout* can be used to control the maximum number of seconds to wait before
+                returning.  *timeout* can be an int or float.  If *timeout* is not specified
+                or ``None``, there is no limit to the wait time.
 
-		*return_when* indicates when this function should return.  It must be one of
-		the following constants:
+                *return_when* indicates when this function should return.  It must be one of
+                the following constants:
 
-		.. tabularcolumns:: |l|L|
+                .. tabularcolumns:: |l|L|
 
-		+-----------------------------+----------------------------------------+
-		| Constant                    | Description                            |
-		+=============================+========================================+
-		| :const:`FIRST_COMPLETED`    | The function will return when any      |
-		|                             | future finishes or is cancelled.       |
-		+-----------------------------+----------------------------------------+
-		| :const:`FIRST_EXCEPTION`    | The function will return when any      |
-		|                             | future finishes by raising an          |
-		|                             | exception.  If no future raises an     |
-		|                             | exception then it is equivalent to     |
-		|                             | :const:`ALL_COMPLETED`.                |
-		+-----------------------------+----------------------------------------+
-		| :const:`ALL_COMPLETED`      | The function will return when all      |
-		|                             | futures finish or are cancelled.       |
-		+-----------------------------+----------------------------------------+
+                +-----------------------------+----------------------------------------+
+                | Constant                    | Description                            |
+                +=============================+========================================+
+                | :const:`FIRST_COMPLETED`    | The function will return when any      |
+                |                             | future finishes or is cancelled.       |
+                +-----------------------------+----------------------------------------+
+                | :const:`FIRST_EXCEPTION`    | The function will return when any      |
+                |                             | future finishes by raising an          |
+                |                             | exception.  If no future raises an     |
+                |                             | exception then it is equivalent to     |
+                |                             | :const:`ALL_COMPLETED`.                |
+                +-----------------------------+----------------------------------------+
+                | :const:`ALL_COMPLETED`      | The function will return when all      |
+                |                             | futures finish or are cancelled.       |
+                +-----------------------------+----------------------------------------+
         """
-        tasks = [asyncio.create_task(self._run_job(job)) for job in 
-            sorted([job for job in self.jobs if job.should_run])]
+        tasks = [
+            asyncio.create_task(self._run_job(job))
+            for job in sorted([job for job in self.jobs if job.should_run])
+        ]
         if not tasks:
             return [], []
 
@@ -137,34 +139,35 @@ class Scheduler(object):
     async def run_all(self, delay_seconds=0, *args, **kwargs):
         """Run all jobs regardless if they are scheduled to run or not.
 
-		*timeout* can be used to control the maximum number of seconds to wait before
-		returning.  *timeout* can be an int or float.  If *timeout* is not specified
-		or ``None``, there is no limit to the wait time.
+        *timeout* can be used to control the maximum number of seconds to wait before
+        returning.  *timeout* can be an int or float.  If *timeout* is not specified
+        or ``None``, there is no limit to the wait time.
 
-		*return_when* indicates when this function should return.  It must be one of
-		the following constants:
+        *return_when* indicates when this function should return.  It must be one of
+        the following constants:
 
-		.. tabularcolumns:: |l|L|
+        .. tabularcolumns:: |l|L|
 
-		+-----------------------------+----------------------------------------+
-		| Constant                    | Description                            |
-		+=============================+========================================+
-		| :const:`FIRST_COMPLETED`    | The function will return when any      |
-		|                             | future finishes or is cancelled.       |
-		+-----------------------------+----------------------------------------+
-		| :const:`FIRST_EXCEPTION`    | The function will return when any      |
-		|                             | future finishes by raising an          |
-		|                             | exception.  If no future raises an     |
-		|                             | exception then it is equivalent to     |
-		|                             | :const:`ALL_COMPLETED`.                |
-		+-----------------------------+----------------------------------------+
-		| :const:`ALL_COMPLETED`      | The function will return when all      |
-		|                             | futures finish or are cancelled.       |
-		+-----------------------------+----------------------------------------+
-		"""
+        +-----------------------------+----------------------------------------+
+        | Constant                    | Description                            |
+        +=============================+========================================+
+        | :const:`FIRST_COMPLETED`    | The function will return when any      |
+        |                             | future finishes or is cancelled.       |
+        +-----------------------------+----------------------------------------+
+        | :const:`FIRST_EXCEPTION`    | The function will return when any      |
+        |                             | future finishes by raising an          |
+        |                             | exception.  If no future raises an     |
+        |                             | exception then it is equivalent to     |
+        |                             | :const:`ALL_COMPLETED`.                |
+        +-----------------------------+----------------------------------------+
+        | :const:`ALL_COMPLETED`      | The function will return when all      |
+        |                             | futures finish or are cancelled.       |
+        +-----------------------------+----------------------------------------+
+        """
         if delay_seconds:
-            warnings.warn("The `delay_seconds` parameter is deprecated.",
-                DeprecationWarning)
+            warnings.warn(
+                "The `delay_seconds` parameter is deprecated.", DeprecationWarning
+            )
         tasks = [asyncio.create_task(self._run_job(job)) for job in self.jobs[:]]
         if not tasks:
             return [], []
@@ -519,7 +522,6 @@ class Job(object):
         return self
 
     def at(self, time_str: str, tz: str = None):
-
         """
         Specify a particular time that the job should be run at.
 
