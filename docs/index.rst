@@ -1,26 +1,24 @@
 schedule
 ========
 
-.. image:: https://api.travis-ci.org/ibrb/python-aioschedule.svg?branch=master
-        :target: https://travis-ci.org/ibrb/python-aioschedule
+.. image:: https://api.travis-ci.org/geoff-carve-systems/python-aioschedule.svg?branch=master
+        :target: https://travis-ci.org/geoff-carve-systems/python-aioschedule
 
-.. image:: https://coveralls.io/repos/ibrb/python-aioschedule/badge.svg?branch=master
-        :target: https://coveralls.io/r/ibrb/python-aioschedule
-
-.. image:: https://img.shields.io/pypi/v/aioschedule.svg
-        :target: https://pypi.python.org/pypi/aioschedule
-
-.. image:: https://media.ibrb.org/ibr/images/logos/landscape1200.png
-        :target: https://media.ibrb.org/ibr/images/logos/landscape1200.png
+.. image:: https://coveralls.io/repos/geoff-carve-systems/python-aioschedule/badge.svg?branch=master
+        :target: https://coveralls.io/r/geoff-carve-systems/python-aioschedule
 
 
-Python job scheduling for humans. Run Python functions (or any other callable) periodically using a friendly syntax.
+Python job scheduling for humans.
+
+Forked from github.com/ibrb/python-aioschedule and rebased from a recent version of github.com/dbader/schedule.
+
+Bug fixes for code in both source repos.
 
 - A simple to use API for scheduling jobs, made for humans.
 - In-process scheduler for periodic jobs. No extra processes needed!
 - Very lightweight and no external dependencies.
 - Excellent test coverage.
-- Tested on Python 3.6, 3.7, 3.8 and 3.9
+- Tested on Python and 3.7, 3.8, 3.9, 3.10, 3.11
 
 
 :doc:`Example <examples>`

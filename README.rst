@@ -2,26 +2,24 @@ aioschedule
 ===========
 
 
-.. image:: https://api.travis-ci.org/ibrb/python-aioschedule.svg?branch=master
-        :target: https://travis-ci.org/ibrb/python-aioschedule
+.. image:: https://api.travis-ci.org/geoff-carve-systems/python-aioschedule.svg?branch=master
+        :target: https://travis-ci.org/geoff-carve-systems/python-aioschedule
 
-.. image:: https://coveralls.io/repos/ibrb/python-aioschedule/badge.svg?branch=master
-        :target: https://coveralls.io/r/ibrb/python-aioschedule
-
-.. image:: https://img.shields.io/pypi/v/aioschedule.svg
-        :target: https://pypi.python.org/pypi/aioschedule
-
-.. image:: https://media.ibrb.org/ibr/images/logos/landscape1200.png
-        :target: https://media.ibrb.org/ibr/images/logos/landscape1200.png
+.. image:: https://coveralls.io/repos/geoff-carve-systems/python-aioschedule/badge.svg?branch=master
+        :target: https://coveralls.io/r/geoff-carve-systems/python-aioschedule
 
 
-Python job scheduling for humans. Forked and modified from github.com/dbader/schedule.
+Python job scheduling for humans. 
+
+Forked from github.com/ibrb/python-aioschedule and rebased from a recent version of github.com/dbader/schedule.
+
+Bug fixes for code in both source repos.
 
 - A simple to use API for scheduling jobs, made for humans.
 - In-process scheduler for periodic jobs. No extra processes needed!
 - Very lightweight and no external dependencies.
 - Excellent test coverage.
-- Tested on Python and 3.6, 3.7, 3.8, 3.9
+- Tested on Python and 3.6, 3.7, 3.8, 3.9, 3.10, 3.11
 
 Usage
 -----
@@ -67,6 +65,7 @@ environment. Make sure to set the `IBR_GIT_COMMITTER_NAME` and
 Meta
 ----
 
+- Geoff Robinson - geoff.robinson@carvesystems.com
 - Daniel Bader - `@dbader_org <https://twitter.com/dbader_org>`_ - mail@dbader.org
 - Cochise Ruhulessin - `@magicalcochise <https://twitter.com/magicalcochise>`_ - c.ruhulessin@ibrb.org
 
@@ -74,4 +73,4 @@ Inspired by `Adam Wiggins' <https://github.com/adamwiggins>`_ article `"Rethinki
 
 Distributed under the MIT license. See `LICENSE.txt <https://github.com/dbader/schedule/blob/master/LICENSE.txt>`_ for more information.
 
-https://github.com/ibrb/python-aioschedule
+https://github.com/geoff-carve-systems/python-aioschedule
