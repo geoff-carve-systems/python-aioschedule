@@ -2,8 +2,8 @@ import codecs
 from setuptools import setup
 
 
-SCHEDULE_VERSION = "1.1.0"
-SCHEDULE_DOWNLOAD_URL = "https://github.com/dbader/schedule/tarball/" + SCHEDULE_VERSION
+SCHEDULE_VERSION = "1.1.1"
+SCHEDULE_DOWNLOAD_URL = "https://github.com/geoff-carve-systems/python-aioschedule/tarball/" + SCHEDULE_VERSION
 
 def read_file(filename):
     """
@@ -21,9 +21,9 @@ setup(
     description='Job scheduling for humans.',
     long_description=read_file('README.rst'),
     license='MIT',
-    author='Daniel Bader, Cochise Ruhulessin',
-    author_email='development@ibrb.io',
-    url='https://github.com/ibrb/python-aioschedule',
+    author='Daniel Bader, Cochise Ruhulessin, Geoff Robinson',
+    author_email='geoff.robinson@carvesystems.com',
+    url='https://github.com/geoff-carve-systems/python-aioschedule',
     download_url=SCHEDULE_DOWNLOAD_URL,
     keywords=[
         'aioschedule', 'periodic', 'jobs', 'scheduling', 'clockwork',
@@ -36,11 +36,12 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Natural Language :: English",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.7",
 )
