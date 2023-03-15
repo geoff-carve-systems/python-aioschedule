@@ -127,7 +127,7 @@ class Scheduler(object):
 		|                             | futures finish or are cancelled.       |
 		+-----------------------------+----------------------------------------+
         """
-        jobs = [job.run() for job in self.jobs if job.should_run]
+        jobs = [self._run_job(job) for job in sorted([job for job in self.jobs if job.should_run])]
         if not jobs:
             return [], []
 
