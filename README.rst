@@ -64,13 +64,6 @@ environment. Make sure to set the `IBR_GIT_COMMITTER_NAME` and
 `IBR_GIT_COMMITTER_EMAIL` environment variables.
 
 
-Development
------------
-Run `vagrant up` to spawn a virtual machine containing the development
-environment. Make sure to set the `IBR_GIT_COMMITTER_NAME` and
-`IBR_GIT_COMMITTER_EMAIL` environment variables.
-
-
 Meta
 ----
 
